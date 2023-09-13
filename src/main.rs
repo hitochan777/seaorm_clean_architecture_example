@@ -3,9 +3,10 @@ mod infra;
 
 use std::sync::Arc;
 
+use anyhow::Result;
 use futures::executor::block_on;
-use sea_orm::{Database, DbErr};
-use infra::{entities::{prelude::*, *}, seaorm_connection::SeaOrmConnection, person_repository::SeaOrmPersonRepository, transaction::SeaOrmTransaction};
+use sea_orm::Database;
+use infra::{seaorm_connection::SeaOrmConnection, repository::{SeaOrmPersonRepository, SeaOrmTransaction}};
 
 const DATABASE_URL: &str = "sqlite://sample.db?mode=rwc";
 
@@ -13,6 +14,7 @@ async fn save(transaction: Arc<SeaOrmTransaction>, first_name: String, last_name
     transaction.execute(|repositories| {
         let person = repositories.person_repository.save()
     }).await?;
+    Ok(())
 }
 
 
