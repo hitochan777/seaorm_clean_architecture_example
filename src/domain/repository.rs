@@ -6,8 +6,8 @@ use async_trait::async_trait;
 use futures_util::future::BoxFuture;
 #[async_trait]
 pub trait PersonRepository {
-    async fn fetch_one(&self, id: String) -> Result<Option<Person>>;
-    async fn save(&self, tweet: &Person) -> Result<()>;
+    async fn fetch_one(&self, id: i32) -> Result<Option<Person>>;
+    async fn save(&self, tweet: Person) -> Result<()>;
 }
 
 pub struct Repositories {

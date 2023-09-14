@@ -1,18 +1,23 @@
 mod domain;
 mod infra;
 
+use anyhow::Result;
+use domain::repository::Transaction;
 use std::sync::Arc;
 
-use anyhow::Result;
 use futures::executor::block_on;
-use sea_orm::Database;
 use infra::{seaorm_connection::SeaOrmConnection, repository::{SeaOrmPersonRepository, SeaOrmTransaction}};
+use sea_orm::Database;
 
 const DATABASE_URL: &str = "sqlite://sample.db?mode=rwc";
 
 async fn save(transaction: Arc<SeaOrmTransaction>, first_name: String, last_name: String) -> Result<()> {
     transaction.execute(|repositories| {
-        let person = repositories.person_repository.save()
+        let person = repositories.person_repository.save(crate::domain::person::Person {
+          id: 12,
+          first_name,
+          last_name,
+        });
     }).await?;
     Ok(())
 }
@@ -28,8 +33,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let transaction = Arc::new(SeaOrmTransaction {
         db: conn.clone(),
     });
-    if let Err(err) = block_on(run()) {
-      panic!("{}", err);
-    }
+    save(transaction.clone(), "hoge".to_owned(), "hhi".to_owned()).await?;
     Ok(())
 }
