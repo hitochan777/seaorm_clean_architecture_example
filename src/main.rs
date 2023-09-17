@@ -42,6 +42,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let conn = Arc::new(SeaOrmConnection::DbConn(db.clone()));
     let repository = Arc::new(SeaOrmPersonRepository { db: conn.clone() });
     let transaction = Arc::new(SeaOrmTransaction { db: db.clone() });
-    save(transaction.clone(), "hoge".to_owned(), "hhi".to_owned()).await?;
+    save(transaction.clone(), "foo".to_owned(), "bar".to_owned()).await?;
     Ok(())
 }
