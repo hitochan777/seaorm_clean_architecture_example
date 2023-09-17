@@ -1,6 +1,6 @@
 use crate::domain::repository::{Op, Repositories, Transaction};
 use async_trait::async_trait;
-use sea_orm::{DbErr, EntityTrait, DatabaseTransaction};
+use sea_orm::{DbErr, EntityTrait, DatabaseTransaction, TransactionTrait, DatabaseConnection, DbConn, ConnectionTrait};
 use std::sync::Arc;
 use crate::infra::seaorm_connection::SeaOrmConnection;
 use super::entities::person::Entity as Person;
@@ -21,8 +21,9 @@ impl<'a> PersonRepository for SeaOrmPersonRepository<'a> {
         Ok(person.and_then(|val| Some(domain::person::Person::from(val))))
     }
     async fn save(&self, person: domain::person::Person) -> Result<()> {
+        let id = person.id;
         let model = super::entities::person::ActiveModel::from(super::entities::person::Model::from(person));
-        if let Some(_) = self.fetch_one(person.id.to_owned()).await? {
+        if let Some(_) = self.fetch_one(id).await? {
             Person::update(model).exec(self.db.as_ref()).await?;
         }
         else {
@@ -33,7 +34,7 @@ impl<'a> PersonRepository for SeaOrmPersonRepository<'a> {
 }
 
 pub struct SeaOrmTransaction {
-    pub db: Arc<DatabaseTransaction>,
+    pub db: Arc<DatabaseConnection>,
 }
 
 #[async_trait]
